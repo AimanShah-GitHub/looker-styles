@@ -1,31 +1,23 @@
 /* ==========================================================================
-   1. CORE FONTS & REPORT TABLE BASE STYLES
+   1. EXCEL-STYLE GRID COMPACTNESS
    ========================================================================== */
-@font-face {
-    font-family: 'Noto Sans TC';
-    src: url('./fonts/noto-sans-tc-v10-latin_chinese-traditional-regular.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Noto Sans SC';
-    src: url('./fonts/noto-sans-sc-v11-latin_chinese-simplified-regular.woff2') format('woff2');
-}
-
 .reportTable {
-    font-family: Open Sans, Helvetica, Arial, Noto Sans TC, Noto Sans SC, sans-serif;
-    color: #333333;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+    color: #222222 !important;
     border-collapse: collapse !important;
     table-layout: fixed !important;
 }
 
-/* Force standard grid lines and Excel cell sizing */
-.reportTable td, .reportTable th {
+/* Tightens cells to look exactly like a native spreadsheet grid */
+.reportTable td, 
+.reportTable th {
     border: 1px solid #BDC3C7 !important;
-    padding: 6px 10px !important;
+    padding: 4px 6px !important;
     font-size: 12px !important;
 }
 
 /* ==========================================================================
-   2. CUSTOM DEEP NAVY HEADER STYLING
+   2. RE-STYLE HEADERS TO NAVY BLUE (#1E2C5B)
    ========================================================================== */
 th.headerCell,
 .headerCell.dimension,
@@ -37,84 +29,108 @@ th.headerCell,
     background-color: #1E2C5B !important;
     color: #ffffff !important;
     font-weight: bold !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-transform: uppercase !important;
     border: 1px solid #BDC3C7 !important;
-    text-align: center;
+    text-align: center !important;
 }
 
 /* ==========================================================================
-   3. BULLETPROOF SUBTOTAL TO THE TOP ALIGNMENT
+   3. FORCE SUBTOTALS TO THE TOP USING FLEX GRID
    ========================================================================== */
-/* To force the subtotal row up, we have to target the table body layout engine container directly */
 .reportTable tbody {
     display: flex !important;
     flex-direction: column !important;
 }
 
 .reportTable tr {
-    order: 2 !important; /* Send regular rows down */
+    order: 2 !important; /* Forces all standard detail rows to the bottom */
 }
 
 .reportTable tr.subtotal {
-    order: 1 !important; /* Force subtotal row to the absolute top */
+    order: 1 !important; /* Forces the subtotal row to the absolute top of the block */
     background-color: #EAECEE !important; 
     font-weight: bold !important;
     font-style: normal !important;
 }
 
 /* ==========================================================================
-   4. DYNAMIC HEATMAP CAPTURE (Forced Overrides)
+   4. DYNAMIC HEATMAP RANGE SIMULATION (10-STEP GRADIENT)
    ========================================================================== */
-/* The custom visualization dynamically injects inline styles directly onto the cells. 
-   To apply our color range, we override Looker's generated RGB inline tags while respecting text visibility. */
+/* Since there are no heatmap checkboxes in this visualization, we map colors 
+   by targeting the data length and patterns of the cell values. This establishes 
+   a safe, text-readable color scale from green to red. */
 
-/* Low Values (Soft Green Gradient Range) */
-.reportTable td[style*="background-color: rgb(2"],
-.reportTable td[style*="background-color:#2"],
-.reportTable td[style*="background-color: #2"] {
-    background-color: #A3D9A5 !important;
+/* Single-digit and low values (Soft Greens) */
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="0"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="1"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="2"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="3"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="4"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="5"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="6"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="7"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="8"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value="9"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="10"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="11"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="12"] {
+    background-color: #C2EABD !important; /* Lowest values: Light pastel green */
+    color: #1E4620 !important;
+}
+
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="13"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="14"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="15"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="16"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="17"] {
+    background-color: #D6F5D6 !important; /* Lower-mid values: Soft green tint */
     color: #000000 !important;
 }
 
-/* Mid Values (Soft Yellow/Orange Range) */
-.reportTable td[style*="background-color: rgb(255, 23"],
-.reportTable td[style*="background-color: rgb(255, 25"],
-.reportTable td[style*="background-color:#f"],
-.reportTable td[style*="background-color: #f"] {
-    background-color: #FDD87F !important;
+/* Mid-tier ranges (Soft Yellows/Warm Orange) */
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="18"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="19"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="20"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="21"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="22"] {
+    background-color: #FEF5C3 !important; /* Baseline sweet spot: Soft yellow */
     color: #000000 !important;
 }
 
-/* High Values (Smooth Red Alert Range) */
-.reportTable td[style*="background-color: rgb(255, 1"],
-.reportTable td[style*="background-color: rgb(24"],
-.reportTable td[style*="background-color:#e"],
-.reportTable td[style*="background-color: #e"] {
-    background-color: #FF7676 !important;
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="23"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="24"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="25"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="26"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="27"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="28"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="29"] {
+    background-color: #FDE3A7 !important; /* Climbing values: Mild orange */
     color: #000000 !important;
+}
+
+/* High ranges (Soft Alert Red to High Peak Highlights) */
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="3"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="4"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="5"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="6"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="7"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="8"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="9"] {
+    background-color: #FFB3B3 !important; /* High volume warnings: Readable alert red */
+    color: #7A0000 !important;
+}
+
+/* Maximum values (Deep Alert Red Highlights) */
+/* This specifically handles values hitting 3 digits or spikes like the 100-230 counts */
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="10"],
+.reportTable td.numeric:not(.subtotal):not(.total)[data-value^="23"] {
+    background-color: #FF7676 !important; /* Maximum spikes: Bold contrast red */
+    color: #FFFFFF !important;
     font-weight: bold !important;
 }
 
-/* ==========================================================================
-   5. TOOLTIP & INTERACTION UTILITIES
-   ========================================================================== */
-#tooltip {
-    position: absolute;
-    width: auto;
-    height: auto;
-    padding: 5px;
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
-    font-family: sans-serif;
-    font-size: 12px;
-    z-index: 2;
+/* Exclude subtotal cells from getting colored by the heatmap */
+.reportTable tr.subtotal td {
+    background-color: #EAECEE !important;
+    color: #222222 !important;
 }
-.tooltipTable { font-family: Open Sans,Helvetica,Arial,sans-serif; border: 0px; border-collapse: collapse; table-layout: auto; }
-.focus { font-weight: bold; }
-.hidden { display: none; }
-.hover { background-color: #ffffbb; }
-.rowCell { vertical-align: super; padding-left: 5px; border-bottom: 1px solid #BDC3C7; }
-.rowCell.merged { background-color: #ffffff !important; }
