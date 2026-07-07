@@ -13,19 +13,19 @@
 .reportTable {
     font-family: Open Sans, Helvetica, Arial, Noto Sans TC, Noto Sans SC, sans-serif;
     color: #333333;
-    border-collapse: collapse;
-    table-layout: fixed;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
 }
 
-/* Tighter padding and explicit clean boundaries for an Excel grid look */
+/* Force standard grid lines and Excel cell sizing */
 .reportTable td, .reportTable th {
     border: 1px solid #BDC3C7 !important;
     padding: 6px 10px !important;
-    font-size: 12px;
+    font-size: 12px !important;
 }
 
 /* ==========================================================================
-   2. CUSTOM DEEP NAVY HEADER STYLING (Matching Your Target Style)
+   2. CUSTOM DEEP NAVY HEADER STYLING
    ========================================================================== */
 th.headerCell,
 .headerCell.dimension,
@@ -44,42 +44,60 @@ th.headerCell,
 }
 
 /* ==========================================================================
-   3. FORCE SUBTOTALS TO THE TOP VISUALLY
+   3. BULLETPROOF SUBTOTAL TO THE TOP ALIGNMENT
    ========================================================================== */
+/* To force the subtotal row up, we have to target the table body layout engine container directly */
+.reportTable tbody {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.reportTable tr {
+    order: 2 !important; /* Send regular rows down */
+}
+
 .reportTable tr.subtotal {
-    display: table-header-group !important;
-    background-color: #EAECEE !important; /* Slightly lighter professional gray */
+    order: 1 !important; /* Force subtotal row to the absolute top */
+    background-color: #EAECEE !important; 
     font-weight: bold !important;
-    font-style: normal !important; /* Removes default italicizing for an Excel look */
+    font-style: normal !important;
 }
 
 /* ==========================================================================
-   4. DYNAMIC HEATMAP THEME (Green-to-Red Accent Config)
+   4. DYNAMIC HEATMAP CAPTURE (Forced Overrides)
    ========================================================================== */
-/* We hook directly into the visualization's native dynamic cell rendering. 
-   This creates a smooth, balanced range where low cells fade down to fresh green, 
-   and high cells safely scale up to a clear red alert without obscuring text.
-*/
-.reportTable td.heatmap-low, 
-.reportTable td[style*="background-color"][style*="rgb(2"] {
-    background-color: #A3D9A5 !important; /* Smooth soft green for minimums */
+/* The custom visualization dynamically injects inline styles directly onto the cells. 
+   To apply our color range, we override Looker's generated RGB inline tags while respecting text visibility. */
+
+/* Low Values (Soft Green Gradient Range) */
+.reportTable td[style*="background-color: rgb(2"],
+.reportTable td[style*="background-color:#2"],
+.reportTable td[style*="background-color: #2"] {
+    background-color: #A3D9A5 !important;
     color: #000000 !important;
 }
 
-.reportTable td.heatmap-mid {
-    background-color: #FDD87F !important; /* Mid-tier warning yellow */
+/* Mid Values (Soft Yellow/Orange Range) */
+.reportTable td[style*="background-color: rgb(255, 23"],
+.reportTable td[style*="background-color: rgb(255, 25"],
+.reportTable td[style*="background-color:#f"],
+.reportTable td[style*="background-color: #f"] {
+    background-color: #FDD87F !important;
     color: #000000 !important;
 }
 
-.reportTable td.heatmap-high,
-.reportTable td[style*="background-color"][style*="rgb(255, 1"] {
-    background-color: #FF7676 !important; /* Maximum values: Visible deep red alert */
-    color: #000000 !important; 
-    font-weight: bold;
+/* High Values (Smooth Red Alert Range) */
+.reportTable td[style*="background-color: rgb(255, 1"],
+.reportTable td[style*="background-color: rgb(24"],
+.reportTable td[style*="background-color:#e"],
+.reportTable td[style*="background-color: #e"] {
+    background-color: #FF7676 !important;
+    color: #000000 !important;
+    font-weight: bold !important;
 }
 
 /* ==========================================================================
-   5. TOOLTIP & INTERACTIONS (Carried Over)
+   5. TOOLTIP & INTERACTION UTILITIES
    ========================================================================== */
 #tooltip {
     position: absolute;
@@ -94,14 +112,7 @@ th.headerCell,
     font-size: 12px;
     z-index: 2;
 }
-
-.tooltipTable {
-    font-family: Open Sans,Helvetica,Arial,sans-serif;
-    border: 0px;
-    border-collapse: collapse;
-    table-layout: auto;
-}
-
+.tooltipTable { font-family: Open Sans,Helvetica,Arial,sans-serif; border: 0px; border-collapse: collapse; table-layout: auto; }
 .focus { font-weight: bold; }
 .hidden { display: none; }
 .hover { background-color: #ffffbb; }
